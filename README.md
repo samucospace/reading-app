@@ -1,4 +1,4 @@
-﻿# WordPop! ✨ — Voice-Powered Reading App for Kids
+# WordPop! ✨ — Voice-Powered Reading App for Kids
 
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)](https://www.typescriptlang.org/)
@@ -39,7 +39,7 @@ A lightweight, delightful, voice-interactive web application designed to help ch
 ### 2. Install & Run
 ```bash
 # Clone repository
-git clone https://github.com/your-username/reading-app.git
+git clone https://github.com/samucospace/reading-app.git
 cd reading-app
 
 # Install dependencies
