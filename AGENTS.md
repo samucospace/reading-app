@@ -1,4 +1,4 @@
-﻿# AGENTS.md — Agent & Developer Handbook for WordPop!
+# AGENTS.md — Agent & Developer Handbook for WordPop!
 
 This document provides architectural context, design principles, and technical guidelines for AI agents and human developers maintaining or extending **WordPop!**.
 
@@ -31,12 +31,16 @@ WordPop! is an offline-capable, lightweight, voice-interactive educational web a
 
 ### 2. Speech Recognition Pipeline (`src/hooks/useSpeechRecognition.ts`)
 - Utilizes `window.SpeechRecognition` or `window.webkitSpeechRecognition`.
-- **Matching Pipeline (`checkWordMatch`)**:
-  1. Cleans and extracts words: `transcript.toUpperCase().replace(/[^A-Z\s]/g, ' ').split(/\s+/)`.
-  2. Exact token match: checks if target word is inside spoken words.
-  3. Homophone resolution: handles phonetic matches defined in `HOMOPHONES` (e.g. `SUN` ➔ `SON`, `SEE` ➔ `SEA`, `RED` ➔ `READ`, `BEAR` ➔ `BARE`).
-  4. Plural suffix tolerance: matches `CATS` for `CAT` or `DOGS` for `DOG`.
-- **Reconnection Logic**: In Chromium browsers, speech recognition can time out during silence. The hook automatically restarts listening if `enabled` is true and no match has occurred yet.
+- **Multi-Alternative Hypotheses (`maxAlternatives = 5`)**:
+  - Speech recognizers often rank phonetically similar kid pronunciations as alternative hypotheses #2 through #5. The hook checks ALL alternatives returned in the event, not just the top one.
+- **5-Stage Matching Pipeline (`checkWordMatch`)**:
+  1. **Exact Token Match**: Checks if target word is inside spoken words.
+  2. **Comprehensive Speech-to-Text & Homophone Map (`PHONETIC_MAP`)**: 60+ mappings for common early reader words (e.g. `CAT` ➔ `KAT`, `CUT`, `CAP`, `COT`, `THAT`; `DOG` ➔ `DOC`, `DUG`, `DAWG`; `FROG` ➔ `FOG`, `FLOG`; `FOX` ➔ `FOCKS`, `FOLKS`).
+  3. **Kid Suffix & Prefix Tolerance**: Matches `CATS`/`KITTY` for `CAT`, `DOGGY`/`DOGS` for `DOG`, `FROGS` for `FROG`.
+  4. **Phonetic Consonant Skeleton**: Compares vowel-stripped consonant skeletons (e.g. `DOG` ➔ `TG`, `DUG` ➔ `TG`) collapsing repeated sounds.
+  5. **Fuzzy Levenshtein Edit Distance**: Allows single letter distance or $\ge 75\%$ similarity for minor lisp/accent/background noise variations.
+- **Interim Instant Triggering**: Matches are evaluated on interim results so the word explodes instantly the moment the child finishes uttering the word, without waiting for silence timeouts.
+- **Sensitivity Mode**: Includes a toggle in Settings between **"Forgiving / Kid Mode"** (default) and **"Strict / Exact"**.
 
 ### 3. Audio Synthesis Engine (`src/utils/audio.ts`)
 - **`playPopSound()`**: Fast sine wave frequency sweep (320Hz ➔ 780Hz) with exponential gain decay (0.12s) for tactile button feedback.

@@ -22,10 +22,15 @@ A lightweight, delightful, voice-interactive web application designed to help ch
   - **Earned into Chest**: Read out loud with the child's own voice with no hints.
   - **Practice Mode (No Sticker)**: Tapping **"Hear Word"** (audio hint) or **"I Said It! 👍"** (parent override) allows kids to practice and triggers the explosion, but does not award the sticker into the chest.
 - **📚 Graded Word Decks & Custom Words**:
-  - **Starter Phonics (CVC)**: CAT, DOG, SUN, PIG, BUG, HAT, FOX, CUP, BED...
-  - **Magic Sight Words**: THE, SEE, YOU, CAN, LOOK, PLAY, LIKE, BIG, RED, BLUE...
-  - **Animals & Wonders**: STAR, MOON, FROG, FISH, DUCK, TREE, LION, BEAR...
-  - **Custom Words**: Parents and teachers can easily type and add custom vocabulary lists.
+  - **🏆 Top 300 Most Common Words**: The complete Fry master list accounting for over 65% of all English reading material!
+  - **🥇 Top 100 Common Words (Tier 1)**: The core foundational words (THE, OF, AND, A, TO, IN, IS, YOU, THAT, IT...).
+  - **🥈 Second 100 Common Words (Tier 2)**: Expanding vocabulary and fluency (OVER, NEW, SOUND, TAKE, WORK, PLACE, YEAR...).
+  - **🥉 Third 100 Common Words (Tier 3)**: Advanced high-frequency words (EVERY, NEAR, FOOD, SCHOOL, FATHER, EARTH, LIGHT...).
+  - **🐱 Starter Phonics (CVC)**: 3-letter sounding words (CAT, DOG, SUN, PIG, BUG, HAT, FOX, CUP...).
+  - **⭐ Magic Sight Words**: THE, SEE, YOU, CAN, LOOK, PLAY, LIKE, BIG, RED, BLUE...
+  - **🚀 Animals & Wonders**: STAR, MOON, FROG, FISH, DUCK, TREE, LION, BEAR...
+  - **🔀 Deck Shuffle**: One-tap shuffle button to randomize words for dynamic practice.
+  - **✍️ Custom Words**: Parents and teachers can easily type and add custom vocabulary lists.
 - **🔒 HTTPS Ready for Mobile & Tablet**: Automatically bundled with `@vitejs/plugin-basic-ssl` so you can test on iPad or Android phones over local Wi-Fi with microphone permissions enabled.
 
 ---

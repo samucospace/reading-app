@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { X, Settings, Plus, Sparkles, Sliders, Volume2, VolumeX } from 'lucide-react';
+import { X, Settings, Plus, Sparkles, Sliders, Volume2, VolumeX, Mic } from 'lucide-react';
 import type { WordCategory } from '../data/wordLists';
 import { playPopSound } from '../utils/audio';
 
@@ -15,6 +15,8 @@ interface SettingsModalProps {
   onAddCustomWords: (words: string[]) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  forgivingMode: boolean;
+  onToggleForgivingMode: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -29,6 +31,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onAddCustomWords,
   soundEnabled,
   onToggleSound,
+  forgivingMode,
+  onToggleForgivingMode,
 }) => {
   const [newWordsInput, setNewWordsInput] = useState('');
 
@@ -62,7 +66,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div>
               <h2 className="text-2xl font-black text-amber-950">Settings & Word Packs</h2>
               <p className="text-amber-900/80 text-xs md:text-sm font-semibold">
-                Customize time, word decks, and options
+                Customize time, word decks, and sensitivity
               </p>
             </div>
           </div>
@@ -79,7 +83,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Timer Selection */}
           <div>
             <label className="flex items-center gap-2 text-base font-black text-amber-950 mb-3">
@@ -109,6 +113,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Voice Sensitivity Setting */}
+          <div className="flex items-center justify-between p-3.5 bg-white rounded-2xl border-2 border-amber-200">
+            <div className="flex items-center gap-3">
+              <Mic className="w-6 h-6 text-indigo-600" />
+              <div>
+                <span className="font-bold text-amber-950 text-sm md:text-base">Kid-Friendly Voice Match</span>
+                <p className="text-xs text-amber-800/70">
+                  {forgivingMode
+                    ? 'Forgiving (tolerates accents, sounding out & near matches)'
+                    : 'Strict (exact dictionary match only)'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                playPopSound();
+                onToggleForgivingMode();
+              }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs md:text-sm cursor-pointer border transition-all ${
+                forgivingMode
+                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                  : 'bg-amber-100 text-amber-800 border-amber-300'
+              }`}
+            >
+              {forgivingMode ? 'Forgiving ✨' : 'Strict 🎯'}
+            </button>
           </div>
 
           {/* Sound FX Toggle */}

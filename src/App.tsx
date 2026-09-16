@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Sparkles, Trophy, Settings, Flame, RotateCcw, Users } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Sparkles, Trophy, Settings, Flame, RotateCcw, Users, Shuffle } from 'lucide-react';
 import { DEFAULT_WORD_CATEGORIES } from './data/wordLists';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { WordCard } from './components/WordCard';
@@ -45,7 +45,6 @@ export const App: React.FC = () => {
   });
 
   const [isSetupOpen, setIsSetupOpen] = useState<boolean>(() => {
-    // If no profiles or no active profile, show setup screen
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PROFILES);
       const list = saved ? JSON.parse(saved) : [];
@@ -70,6 +69,7 @@ export const App: React.FC = () => {
   const [activeCategoryId, setActiveCategoryId] = useState<string>('cvc');
   const [timerDuration, setTimerDuration] = useState<number>(10);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [forgivingMode, setForgivingMode] = useState<boolean>(true);
 
   // Active word and progression state
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -142,8 +142,12 @@ export const App: React.FC = () => {
     }
   };
 
+  // Deck shuffling state
+  const [shuffleSeed, setShuffleSeed] = useState<number>(1);
+
   // Build active word deck
   const activeDeck: WordItem[] = useMemo(() => {
+    let base: WordItem[];
     if (activeCategoryId === 'all') {
       const combined = DEFAULT_WORD_CATEGORIES.flatMap((c) => c.words);
       const customs: WordItem[] = customWords.map((cw) => ({
@@ -151,12 +155,23 @@ export const App: React.FC = () => {
         hint: 'Custom Word',
         emoji: '⭐',
       }));
-      return [...combined, ...customs];
+      base = [...combined, ...customs];
+    } else {
+      const cat = DEFAULT_WORD_CATEGORIES.find((c) => c.id === activeCategoryId);
+      base = cat ? cat.words : DEFAULT_WORD_CATEGORIES[0].words;
     }
-    const cat = DEFAULT_WORD_CATEGORIES.find((c) => c.id === activeCategoryId);
-    if (!cat) return DEFAULT_WORD_CATEGORIES[0].words;
-    return cat.words;
-  }, [activeCategoryId, customWords]);
+
+    if (shuffleSeed > 0) {
+      const shuffled = [...base];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    return base;
+  }, [activeCategoryId, customWords, shuffleSeed]);
 
   // Current active word item
   const currentWordItem: WordItem = useMemo(() => {
@@ -314,6 +329,7 @@ export const App: React.FC = () => {
     targetWord: currentWordItem.text,
     onSuccess: (word) => handleWordSuccess(word, true),
     enabled: !isSetupOpen && !isExploding && !isInventoryOpen && !isSettingsOpen,
+    forgivingMode,
   });
 
   // If on setup screen or no profile chosen, render ProfileSetupScreen
@@ -438,14 +454,30 @@ export const App: React.FC = () => {
           isExploding={isExploding}
         />
 
-        {/* Reset timer quick button */}
-        <button
-          onClick={handleResetTimer}
-          className="mt-4 flex items-center gap-1.5 text-xs text-amber-800/70 hover:text-amber-950 font-bold cursor-pointer py-1 px-3 rounded-lg hover:bg-amber-200/50 transition-colors"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Restart 10s Timer</span>
-        </button>
+        {/* Action helper buttons */}
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            onClick={() => {
+              playPopSound();
+              setShuffleSeed((prev) => prev + 1);
+              setCurrentIndex(0);
+              setRemainingSeconds(timerDuration > 0 ? timerDuration : 0);
+            }}
+            className="flex items-center gap-1.5 text-xs text-amber-800/80 hover:text-amber-950 font-bold cursor-pointer py-1.5 px-3.5 rounded-xl bg-amber-200/50 hover:bg-amber-200 border border-amber-300 transition-colors shadow-2xs"
+            title="Shuffle deck order"
+          >
+            <Shuffle className="w-3.5 h-3.5" />
+            <span>Shuffle Deck 🔀</span>
+          </button>
+
+          <button
+            onClick={handleResetTimer}
+            className="flex items-center gap-1.5 text-xs text-amber-800/80 hover:text-amber-950 font-bold cursor-pointer py-1.5 px-3.5 rounded-xl bg-amber-200/50 hover:bg-amber-200 border border-amber-300 transition-colors shadow-2xs"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Restart 10s Timer</span>
+          </button>
+        </div>
       </main>
 
       {/* Footer Info */}
@@ -490,6 +522,8 @@ export const App: React.FC = () => {
         onAddCustomWords={handleAddCustomWords}
         soundEnabled={soundEnabled}
         onToggleSound={() => setSoundEnabled((prev) => !prev)}
+        forgivingMode={forgivingMode}
+        onToggleForgivingMode={() => setForgivingMode((prev) => !prev)}
       />
     </div>
   );
